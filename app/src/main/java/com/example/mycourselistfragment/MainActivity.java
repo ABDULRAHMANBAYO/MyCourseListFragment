@@ -4,29 +4,41 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 
+import android.content.Intent;
 import android.os.Bundle;
 
-public class MainActivity extends AppCompatActivity {
+import com.example.mycourselistfragment.data.Course;
+
+public class MainActivity extends AppCompatActivity implements CourseListFragment.Callbacks {
+    private boolean isTwoPage = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        if (findViewById(R.id.detailContainer) != null) {
+            isTwoPage = true;
+        }
+    }
 
-        FragmentManager fragmentManager = getSupportFragmentManager();
-        Fragment fragment = fragmentManager.findFragmentById(R.id.myContainer);
+    @Override
+    public void onItemSelected(Course course, int position) {
+        if (isTwoPage) {
+            Bundle bundle = new Bundle();
+            bundle.putInt("course_id", position);
 
-        if(fragment == null)
-        {
-            fragment = new MyFragment();
+            FragmentManager fragmentManager = getSupportFragmentManager();
+            CourseDetailFragment fragment = new CourseDetailFragment();
+            fragment.setArguments(bundle);
             fragmentManager.beginTransaction()
-            .add(R.id.myContainer,fragment)
-            .commit()
-
-            ;
+                    .replace(R.id.detailContainer, fragment)
+                    .commit();
+        } else {
+            Intent intent = new Intent(MainActivity.this, CourseDetailActivity.class);
+            intent.putExtra("course_id", position);
+            startActivity(intent);
 
         }
-
 
     }
 }
